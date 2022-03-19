@@ -26,7 +26,7 @@ LiveData 클래스는 ViewModel의 개별적인 데이터 필드를 갖을 수 �
 ObservableFiled와 같이 Observable을 구현하는 객체들과는 달리 LiveData 객체는 lifecycle의 옵저버에 등록된 데이터 변화를 알 수 있습니다. 
 * 수동으로 lifecycle을 처리할 필요가 없음 : UI 컴포넌트는 연관있는 data를 관찰하기만 하고 멈추거나 중단하지 않습니다. LiveData는 
   연관된 lifecycle의 상태변화의 인지를 관찰하는 관찰할 때 부터 자동적으로 관리합니다. 
-* Transformations와 MediatorLiveData로 인한 더 많은 기능들 : LiveData의 사용은 <https://developer.android.com/reference/androidx/lifecycle/Transformations">Transformations</a>와
+* Transformations와 MediatorLiveData로 인한 더 많은 기능들 : LiveData의 사용은 <a href="https://developer.android.com/reference/androidx/lifecycle/Transformations">Transformations</a>와
   <a href="https://developer.android.com/reference/androidx/lifecycle/MediatorLiveData">MediatorLiveData</a>의 기능들을 사용할 수 있습니다. 
   만약 관찰되는 여러 view들이 존재해도 하나의 MediatorLiveData로 관찰 가능합니다. 
 * 자원 공유 : LiveData를 확장하여 커스텀 객체를 생성하는 것은 System service에 한번 연결하는 것을 허용하여, 자원을 필요로하는 어떠한 옵저버가 객체를 관찰 가능하게 합니다.
