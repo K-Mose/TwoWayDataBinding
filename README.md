@@ -2,7 +2,7 @@
 **Android Two-way DataBinding : <a href="https://developer.android.com/topic/libraries/data-binding/two-way?hl=ko">양방향 데이터 결합</a><br>**
 LiveData & ViewModel(+ViewModelFactory)를 이용한 DataBinding
 
-## <https://proandroiddev.com/advanced-data-binding-binding-to-livedata-one-and-two-way-binding-dae1cd68530f">Advanced Data Binding : Binding to LiveData<a>
+## <a href="https://proandroiddev.com/advanced-data-binding-binding-to-livedata-one-and-two-way-binding-dae1cd68530f">Advanced Data Binding : Binding to LiveData<a>
 많은 안드로이드의 앱들이 MVVM으로 사용됨에 따라 Data Bindng의 사용은 더 증가되었습니다. Data Binding은 UI 컴포넌트와 결합되어 
   
 **Why binding to LiveData?**<br>
