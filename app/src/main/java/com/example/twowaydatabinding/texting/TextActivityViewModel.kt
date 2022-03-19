@@ -1,9 +1,9 @@
-package com.example.twowaydatabinding
+package com.example.twowaydatabinding.texting
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class MainActivityViewModel : ViewModel() {
+class TextActivityViewModel : ViewModel() {
 
     val userName = MutableLiveData<String>()
 
