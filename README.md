@@ -64,11 +64,103 @@ ViewModel은 범위가 지정된 lifecycle이 완전히 끝날 때 까지(Activi
 일반적으로 시스템에서 Activty의 onCreate() 메서드가 처음 호출될 때 ViewModel을 요청하고, Acitivy가 onDestory() 될 때까지 ViewModel은 존재하며, ViewModel이 더이상 사용되지 않게된다면 ViewModel의 onCleared()를 호출하여 폐기합니다. 
 <br>  
 <br>
-**ViewModel with ViewModelProvider.Factory**
-*추가 예정*
+### ViewModel with ViewModelProvider.Factory
+ViewModel은 ViewModelProvider를 통해서 생성될 수 있습니다. ViewModelProvider는 ViewModel에 범위를 제공하는 유틸리티 클래스 입니다. ViewModelProvider 생성자에 ViewModelStoreOwner로 범위(Activity또는 Fragment)를 지정 후, get()함수로 modelClass를 받고 해당 ViewModel 인스턴스를 반환합니다. 
+```kotlin
+class TextActivity : AppCompatActivity() {
+  private lateinit var viewModel: TextActivityViewModel
+  override fun onCreate(savedInstanceState: Bundle?) {
+    …
+    viewModel = ViewModelProvider(this).get(TextActivityViewModel::class.java)  
+  }
+} 
+```
+<br>
+위 코드는 * ViewModelProvider.Factory * 없이 잘 잗동 됩니다.<br>
+그렇다면 * ViewModelProvider.Factory *는 언제 필요할까요?
   
+```kotlin 
+# NumberActivityViewModel.kt
+class NumberActivityViewModel(startingTotal: Int, private val context: Context) : ViewModel() {
+  …
+}
+
+# NumberActivityViewModelFactory.kt
+class NumberActivityViewModelFactory(
+    private val startingTotal: Int,
+    private val context: Context
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if(modelClass.isAssignableFrom(NumberActivityViewModel::class.java)) {
+            return NumberActivityViewModel(startingTotal, context) as T
+        }
+        throw IllegalArgumentException("Unknown View Model Class")
+    }
+}
+  
+# NumberActivity.kt
+class NumberActivity : AppCompatActivity() {
+  private lateinit var viewModel: NumberActivityViewModel
+  private lateinit var viewModelFactory: NumberActivityViewModelFactory
+  override fun onCreate(savedInstanceState: Bundle?) {
+    …
+    viewModelFactory = NumberActivityViewModelFactory(318, this)
+    viewModel = ViewModelProvider(this, viewModelFactory).get(NumberActivityViewModel::class.java)
+  }
+}
+```
+일반적으로 ViewModelProvider.Factory의 구현체는 생성할 ViewModel 클래스 생성자의 매개변수가 있을 때 작성합니다. 매개변수가 있는 ViewModel 클래스를 ViewModelProvider.Factory를 작성하지 않는다면 ViewModelProvider <a href="https://developer.android.com/reference/androidx/lifecycle/ViewModelProvider.NewInstanceFactory">내부의 default Factory 구현체가</a> 인스턴스를 반환합니다. 이때 complie time 에러가 없지만, runtime error가 발생하게 됩니다. (RuntimeException cannot create an instance of MyViewModel.) 
+<br>
 <br>  
 
+# Data Binding
+데이터 바인딩을 사용하기 위해서는 app level의 gradle 파일에 아래와 같이 buildFeature를 추가합니다.   
+```
+# build.gradle  
+  buildFeatures {
+    dataBinding true
+  }
+```
+<br>  
+이후 데이터 바인딩을 사용하기 위해 Activity에 연결된 xml을 <layout> 태그로 감싼 후 <data> 태그로 ViewModel과 연결할 변수를 작성합니다.
+```
+# activity_text.xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.twowaydatabinding.texting.TextActivityViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".TextActivity">
+        …
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+```
+<br>
+Activity로 돌아와 생성된 Binding 객체에 ViewModel을 연결해줍니다. 
+```kotlin 
+class TextActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityTextBinding
+    private lateinit var viewModel: TextActivityViewModel
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_text)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_text)
+        viewModel = ViewModelProvider(this).get(TextActivityViewModel::class.java)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+    }
+}
+```  
+<br>  
 # Two-way Data Binidng
 양뱡향 데이터 바인딩은 기존 데이터 바인딩에서 아래와 같이 변경하기만 하면 됩니다. 
 ```xml
@@ -89,19 +181,16 @@ ViewModel은 범위가 지정된 lifecycle이 완전히 끝날 때 까지(Activi
             ……. />
 ```
   <br>
-EditText에 userName이라는 Live데이터가 연결되고, userName이 변경될 때 EditText를 리스너로 사용하기 위해 @={}로 표기합니다. 
+EditText에 userName이라는 LiveData가 연결되고, userName이 변경될 때 EditText를 리스너로 사용하기 위해 @={}로 표기합니다. 
 @={} 표기법은 속성과 관련된 데이터 변경사항을 받는 동시에 사용자 업데이트를 수신 대기합니다.
   
-## Preview
-  text | number
-  -----|----
-  ![20220320_154409](https://user-images.githubusercontent.com/55622345/159151645-e86d5416-8229-4eb4-a82d-1de4c33f3e83.gif)|![20220320_154619](https://user-images.githubusercontent.com/55622345/159151652-cdcca351-224d-4a63-acbd-7dc8b18b9128.gif)
 
 
 
 ## Ref.
   * https://developer.android.com/topic/libraries/data-binding?hl=ko
   * https://developer.android.com/topic/libraries/data-binding/two-way?hl=ko  
+  * https://developer.android.com/topic/libraries/architecture/viewmodel
   * https://proandroiddev.com/advanced-data-binding-binding-to-livedata-one-and-two-way-binding-dae1cd68530f
   * https://medium.com/mindorks/livedata-viewmodel-making-your-own-magic-73facb06fbb
   * https://medium.com/koderlabs/viewmodel-with-viewmodelprovider-factory-the-creator-of-viewmodel-8fabfec1aa4f
