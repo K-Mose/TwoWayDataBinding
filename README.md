@@ -64,7 +64,7 @@ ViewModel은 범위가 지정된 lifecycle이 완전히 끝날 때 까지(Activi
 일반적으로 시스템에서 Activty의 onCreate() 메서드가 처음 호출될 때 ViewModel을 요청하고, Acitivy가 onDestory() 될 때까지 ViewModel은 존재하며, ViewModel이 더이상 사용되지 않게된다면 ViewModel의 onCleared()를 호출하여 폐기합니다. 
 <br>  
 <br>
-### ViewModel with ViewModelProvider.Factory
+### ViewModel with ViewModelProvider.Factory <br>
 ViewModel은 ViewModelProvider를 통해서 생성될 수 있습니다. ViewModelProvider는 ViewModel에 범위를 제공하는 유틸리티 클래스 입니다. ViewModelProvider 생성자에 ViewModelStoreOwner로 범위(Activity또는 Fragment)를 지정 후, get()함수로 modelClass를 받고 해당 ViewModel 인스턴스를 반환합니다. 
 ```kotlin
 class TextActivity : AppCompatActivity() {
@@ -75,9 +75,8 @@ class TextActivity : AppCompatActivity() {
   }
 } 
 ```
-<br>
-위 코드는 * ViewModelProvider.Factory * 없이 잘 잗동 됩니다.<br>
-그렇다면 * ViewModelProvider.Factory *는 언제 필요할까요?
+위 코드는 *ViewModelProvider.Factory* 없이 잘 잗동 됩니다.<br>
+그렇다면 *ViewModelProvider.Factory*는 언제 필요할까요?
   
 ```kotlin 
 # NumberActivityViewModel.kt
@@ -113,38 +112,36 @@ class NumberActivity : AppCompatActivity() {
 <br>
 <br>  
 
-# Data Binding
-데이터 바인딩을 사용하기 위해서는 app level의 gradle 파일에 아래와 같이 buildFeature를 추가합니다.   
+## Data Binding
+데이터 바인딩을 사용하기 위해서는 app level의 gradle 파일에 아래와 같이 buildFeature를 추가합니다.<br>
 ```
 # build.gradle  
   buildFeatures {
     dataBinding true
   }
 ```
-<br>  
-이후 데이터 바인딩을 사용하기 위해 Activity에 연결된 xml을 <layout> 태그로 감싼 후 <data> 태그로 ViewModel과 연결할 변수를 작성합니다.
+이후 데이터 바인딩을 사용하기 위해 Activity에 연결된 xml을 **layout** 태그로 감싼 후 data 태그로 ViewModel과 연결할 변수를 작성합니다.
 ```
-# activity_text.xml
-<?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <variable
-            name="viewModel"
-            type="com.example.twowaydatabinding.texting.TextActivityViewModel" />
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".TextActivity">
-        …
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+    # activity_text.xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+        <data>
+            <variable
+                name="viewModel"
+                type="com.example.twowaydatabinding.texting.TextActivityViewModel" />
+        </data>
+    
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".TextActivity">
+            …
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </layout>
 ```
-<br>
 Activity로 돌아와 생성된 Binding 객체에 ViewModel을 연결해줍니다. 
 ```kotlin 
 class TextActivity : AppCompatActivity() {
@@ -159,10 +156,9 @@ class TextActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
     }
 }
-```  
-<br>  
-# Two-way Data Binidng
-양뱡향 데이터 바인딩은 기존 데이터 바인딩에서 아래와 같이 변경하기만 하면 됩니다. 
+```   
+## Two-way Data Binidng
+양뱡향 데이터 바인딩은 기존 데이터 바인딩에서 아래와 같이 변경하기만 하면 됩니다. <br>
 ```xml
           <EditText
             android:layout_width="match_parent"
@@ -171,7 +167,7 @@ class TextActivity : AppCompatActivity() {
             android:text="@{viewModel.userName}"
             ……. />
 ```
-@{} 에서 @={} 로 변환
+***@{} 에서 @={} 로 변환<br>***
 ```xml
           <EditText
             android:layout_width="match_parent"
@@ -180,12 +176,16 @@ class TextActivity : AppCompatActivity() {
             android:text="@={viewModel.userName}"
             ……. />
 ```
-  <br>
 EditText에 userName이라는 LiveData가 연결되고, userName이 변경될 때 EditText를 리스너로 사용하기 위해 @={}로 표기합니다. 
 @={} 표기법은 속성과 관련된 데이터 변경사항을 받는 동시에 사용자 업데이트를 수신 대기합니다.
   
+<br>
 
-
+## Preview
+  text | number
+  -----|----
+  ![20220320_154409](https://user-images.githubusercontent.com/55622345/159151645-e86d5416-8229-4eb4-a82d-1de4c33f3e83.gif)|![20220320_154619](https://user-images.githubusercontent.com/55622345/159151652-cdcca351-224d-4a63-acbd-7dc8b18b9128.gif)
+  
 
 ## Ref.
   * https://developer.android.com/topic/libraries/data-binding?hl=ko
